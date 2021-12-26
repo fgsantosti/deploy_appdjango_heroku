@@ -99,6 +99,9 @@ O arquivo requirements.txt lista as dependências do aplicativo juntas. Para faz
 
 ```pip freeze > requirements.txt```
 
+
+https://contascasal.herokuapp.com/ | https://git.heroku.com/contascasal.git
+
 ```
 git init 
 
@@ -106,5 +109,41 @@ git status
 
 git add . 
 
-git push heroku master ```
+git remote add heroku git@heroku.com:contascasal.git
 
+heroku git:remote -a nome-projeto
+
+heroku git:remote -a contascasal
+
+git remote -v   
+
+git push heroku main
+
+pip install psycopg2
+
+pip install psycopg2-binary
+
+
+
+git remote set-url origin https://fgsantosti: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@github.com/fgsantosti/contas_casal.git
+
+git remote set-url origin https://username:token@github.com/fgsantosti/name_repo.git
+
+heroku run python manage.py migrate
+
+heroku run python manage.py createsuperuser
+
+heroku run python manage.py shell
+
+python manage.py collectstatic
+
+heroku config:set DISABLE_COLLECTSTATIC=1
+
+heroku config:set DISABLE_COLLECTSTATIC=0
+
+
+ref. https://devcenter.heroku.com/articles/django-assets#collectstatic-during-builds
+
+ref. https://devcenter.heroku.com/articles/git
+
+```
