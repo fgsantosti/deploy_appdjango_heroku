@@ -277,7 +277,7 @@ heroku run python manage.py shell
 
 ```
 
-git remote set-url origin https://username:token@github.com/fgsantosti/name_repo.git
+git remote set-url origin https://username:token@github.com/username/name_repo.git
 
 
 ref. https://devcenter.heroku.com/articles/git
