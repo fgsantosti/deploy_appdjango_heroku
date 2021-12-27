@@ -34,7 +34,7 @@ Em um projeto na prática:
 heroku create contascasal
 ```
 
-Saída:
+Ex. Saída:
 ```
 Creating ⬢ contascasal... done
 https://contascasal.herokuapp.com/ | https://git.heroku.com/contascasal.git
@@ -100,49 +100,163 @@ O arquivo requirements.txt lista as dependências do aplicativo juntas. Para faz
 ```pip freeze > requirements.txt```
 
 
-https://contascasal.herokuapp.com/ | https://git.heroku.com/contascasal.git
+
+
+## Configurações de CSS, JS e outros arquivos estáticos
+
+Suas estilização do site logo após um push na plataforma pode não apresentar resultados. Para lidarmos com arquivos estáticos no heroku precisamos realizar algumas configurações específicas. Para isso podemos abrir o arquivo ```settings.py``` onde iremos adicionar alguns trechos de código. 
+
+
 
 ```
-git init 
+...
+código omitido
 
-git status 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
 
-git add . 
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
-git remote add heroku git@heroku.com:contascasal.git
+código omitido
+...
+```
 
-heroku git:remote -a nome-projeto
+Outra configuração que pode ser feita é na variável BASE_DIR, mas por padrão o Django já deixa Ok.
 
-heroku git:remote -a contascasal
+### Instalando o whitenoise
 
-git remote -v   
-
-git push heroku main
-
-pip install psycopg2
-
-pip install psycopg2-binary
-
+O Django não suporta servir arquivos estáticos em produção. No entanto, o fantástico projeto WhiteNoise pode ser integrado ao seu aplicativo Django.
 
 
-git remote set-url origin https://fgsantosti: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@github.com/fgsantosti/contas_casal.git
+```pip install whitenoise
+```
+
+O arquivo requirements.txt precisa atualizar a lista de dependências do aplicativo. Para fazer isso localmente, execute o seguinte comando novamente:
+
+```pip freeze > requirements.txt```
+
+Em seguida, instale o WhiteNoise em seu aplicativo Django. Isso é feito na seção de middleware de settings.py (na parte superior):
+
+
+```
+MIDDLEWARE = [
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
+    código omitido
+    ...
+]
+
+```
+
+Logo depois o comando:
+
+```python manage.py collectstatic
+```
+
+Esse comando é executado automaticamente quando você envia o aplicativo para o Heroku. Caso queria desativar e ativar os a etapa de compilação dos arquivos estáticos do seu projeto você pode utilizar os comandos:
+
+```
+#desativar
+heroku config:set DISABLE_COLLECTSTATIC=1
+
+#ativar
+heroku config:set DISABLE_COLLECTSTATIC=0
+
+```
+
+
+Ref. https://devcenter.heroku.com/articles/django-assets#collectstatic-during-builds
+
+
+## Iniciando a etapa final de Deploy
+
+Realize o login pelo terminal caso ainda nao tenha feito:
+
+```heroku login
+```
+
+Use o Git para clonar o código-fonte do contascasal para sua máquina local, caso seja necessário.
+
+```git init
+```
+```heroku git:clone -a nome_projeto_criado_heroku
+```
+
+Ex.
+
+```
+heroku git:clone -a contascasal
+```
+
+Entre na pasta do seu projeto: 
+
+Ex.
+```
+cd contascasal
+```
+
+## Finalizando o Deploy
+
+
+```git add .```
+
+```git commit -am "make it better"
+```
+
+```git push heroku master
+```
+
+
+Para realizar o migrate das suas tabelas para o banco de dados no Heroku, precisamos apenas adicionar o nome da platarforma a frente e acrecentarmos a palavra run:
+
+```heroku run python manage.py migrate
+```
+
+Da forma direta apresentada acima estamos utilzando o SQLite que é um banco de dados mais simples em relação aos de mercado. 
+
+Para utilizarmos um banco de dados mais robusto precisamos no Heroko de forma gratuita podemos utilizar o comando: 
+
+```heroku addons:create heroku-postgresql:hobby-dev
+```
+
+O comando cria banco de dados mais confiável e poderoso como serviço baseado em PostgreSQL.
+
+Ref. https://elements.heroku.com/addons/heroku-postgresql
+
+Para realizamos a configuração por completo do banco de dados  
+PostgreSQL temos que instalar as seguintes bibliotecas e atualizar o novamente o arquivo 
+
+```pip install psycopg2
+```
+```pip install psycopg2-binary
+```
+```pip freeze > requirements.txt
+```
+
+Para criarmos um super usuário a sua aplicação é da mesma forma:
+
+```heroku run python manage.py createsuperuser
+```
+
+Caso queira executar um comando específico ou executar um script, você pode acionar o shell e executar comandos diretamente na plataforma da sua máquina.
+
+```heroku run python manage.py shell
+```
+
+
+
+```
+
 
 git remote set-url origin https://username:token@github.com/fgsantosti/name_repo.git
 
-heroku run python manage.py migrate
-
-heroku run python manage.py createsuperuser
-
-heroku run python manage.py shell
-
-python manage.py collectstatic
-
-heroku config:set DISABLE_COLLECTSTATIC=1
-
-heroku config:set DISABLE_COLLECTSTATIC=0
-
-
-ref. https://devcenter.heroku.com/articles/django-assets#collectstatic-during-builds
 
 ref. https://devcenter.heroku.com/articles/git
 
